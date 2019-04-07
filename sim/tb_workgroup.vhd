@@ -6,10 +6,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.types.all;
 
-entity tb_conv is
-end tb_conv;
+entity tb_workgroup is
+end tb_workgroup;
 
-architecture rtl of tb_conv is
+architecture rtl of tb_workgroup is
 
 	signal clk : std_logic := '1';
 	--signal rst : std_logic := '0';
