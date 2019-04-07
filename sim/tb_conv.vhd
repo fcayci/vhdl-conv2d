@@ -66,14 +66,14 @@ architecture rtl of tb_conv is
 
 	signal o_img : pixel_array(0 to 24) := (others => (others => '0'));
 	signal i_rgb, o_rgb : pixel := (others => '0');
-	signal i_active, o_active : std_logic := '0';
+	signal i_active, o_valid : std_logic := '0';
 
 begin
 
 	uut0: entity work.workgroup
 	  generic map(H=>H, W=>W)
 	  port map(clk=>clk, i_active=>i_active, i_rgb=>i_rgb,
-	    i_mask=>mask, o_rgb=>o_rgb, o_active=>o_active);
+	    i_mask=>mask, o_rgb=>o_rgb, o_valid=>o_valid);
 
 	-- clock generate
 	process

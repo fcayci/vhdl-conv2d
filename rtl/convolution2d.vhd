@@ -19,9 +19,9 @@ entity convolution2d is
 		-- window / mask
 		window   : in  pixel_array(0 to 8);
 		mask     : in  mask_array(0 to KS**2-1);
-		-- output pixel and video active
+		-- output pixel and valid signals
 		o_pix    : out pixel;
-		o_active : out std_logic
+		o_valid  : out std_logic
 	);
 end convolution2d;
 
@@ -41,9 +41,9 @@ begin
 					end loop;
 				end loop;
 				o_pix <= to_signed(sum, 8);
-				o_active <= '1';
+				o_valid <= '1';
 			else
-				o_active <= '0';
+				o_valid <= '0';
 			end if;
 		end if;
 	end process;

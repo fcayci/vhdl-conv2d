@@ -18,7 +18,7 @@ entity workgroup is
 		i_rgb    : in  pixel; -- input rgb data
 		i_mask   : in  mask_array(0 to KS**2-1); -- 3x3 convolution mask
 		o_rgb    : out pixel; -- output rgb data
-		o_active : out std_logic --output active signal
+		o_valid  : out std_logic -- output valid signal (for writing to a FIFO)
 	);
 end workgroup;
 
@@ -71,7 +71,7 @@ begin
 	  generic map (KS=>KS)
 	  port map (clk=>clk, i_enable=>enable(W+1),
 		window=>window, mask=>i_mask, o_pix=>o_rgb,
-		o_active=>o_active);
+		o_valid=>o_valid);
 
 	-- assign window
 	window <= row1(0 to 2) & row2(0 to 2) & row3(0 to 2);
