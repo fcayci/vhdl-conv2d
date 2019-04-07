@@ -8,9 +8,9 @@ use work.types.all;
 
 entity workgroup is
 	generic(
-		H  : integer := 480;
-		W  : integer := 640;
-		KS : integer := 3
+		H  : integer := 480; -- height of image
+		W  : integer := 640; -- width of image
+		KS : integer := 3    -- mask (kernel) size
 	);
 	port(
 		clk      : in  std_logic;
@@ -26,10 +26,10 @@ architecture rtl of workgroup is
 	-- this will hold the first three rows
 	signal row1 : pixel_array(0 to W-1) := (others => (others => '0'));
 	signal row2 : pixel_array(0 to W-1) := (others => (others => '0'));
-	signal row3 : pixel_array(0 to   2) := (others => (others => '0'));
+	signal row3 : pixel_array(0 to KS-1) := (others => (others => '0'));
 
 	-- window to be convoluted
-	signal window : pixel_array(0 to 8);
+	signal window : pixel_array(0 to KS**2-1);
 
 	-- delay enable signal
 	-- it is one row big + 1 pixel for extra padding
@@ -46,9 +46,9 @@ begin
 			row2 <= row2(1 to W-1) & row3(0);
 			-- flush the buffers when not active
 			if i_active = '1' then
-				row3 <= row3(1 to 2) & i_rgb;
+				row3 <= row3(1 to KS-1) & i_rgb;
 			else
-				row3 <= row3(1 to 2) & x"00";
+				row3 <= row3(1 to KS-1) & x"00";
 			end if;
 		end if;
 	end process;

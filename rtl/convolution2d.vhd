@@ -1,6 +1,6 @@
 -- author: Furkan Cayci, 2019
 -- description: 2d convolution with a given mask
--- variable mask size and fixed pixel size
+-- variable mask and pixel size
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -17,7 +17,7 @@ entity convolution2d is
 		i_enable : in  std_logic;
 		--done   : out std_logic;
 		-- window / mask
-		window   : in  pixel_array(0 to 8);
+		window   : in  pixel_array(0 to KS**2-1);
 		mask     : in  mask_array(0 to KS**2-1);
 		-- output pixel and valid signals
 		o_pix    : out pixel;
