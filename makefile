@@ -5,7 +5,7 @@
 
 CC = ghdl
 SIM = gtkwave
-ARCHNAME = tb_conv
+ARCHNAME = tb_workgroup
 STOPTIME = 1us
 
 # update Xilinx Vivado installation path
