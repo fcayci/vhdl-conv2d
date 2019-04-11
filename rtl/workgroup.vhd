@@ -42,6 +42,7 @@ begin
 		-- active is the signal that comes with rgb values
 		-- (video active area)
 		if rising_edge(clk) then
+			-- push the new pixel to the end of the buffer when active
 			-- flush the buffers when not active
 			if i_active = '1' then
 				rows <= rows(1 to rows'high) & i_rgb;
@@ -73,10 +74,10 @@ begin
 		o_valid=>o_valid);
 
 	-- assign window
-	-- w_gen: for i in 0 to KS-1 generate
-	-- begin
-	-- 	window <= rows(i*W to i*W + KS-1);
-	-- end generate;
-	window <= rows(0 to KS-1) & rows(W to W + KS-1) & rows(2*W to 2*W + KS-1);
+	-- auto generate based on the KS size
+	w_gen: for i in 0 to KS-1 generate
+	begin
+		window(i*KS to i*KS + KS-1) <= rows(i*W to i*W + KS-1);
+	end generate;
 
 end rtl;
