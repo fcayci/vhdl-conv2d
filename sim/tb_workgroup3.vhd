@@ -1,15 +1,15 @@
 -- author: Furkan Cayci, 2019
--- description: workgroup testbench
+-- description: workgroup with 3 mask size testbench
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.types.all;
 
-entity tb_workgroup is
-end tb_workgroup;
+entity tb_workgroup3 is
+end tb_workgroup3;
 
-architecture rtl of tb_workgroup is
+architecture rtl of tb_workgroup3 is
 
 	signal clk : std_logic := '1';
 	--signal rst : std_logic := '0';
@@ -71,9 +71,9 @@ architecture rtl of tb_workgroup is
 begin
 
 	uut0: entity work.workgroup
-	  generic map(H=>H, W=>W)
-	  port map(clk=>clk, i_active=>i_active, i_rgb=>i_rgb,
-	    i_mask=>mask, o_rgb=>o_rgb, o_valid=>o_valid);
+		generic map(H=>H, W=>W, KS=>KS)
+		port map(clk=>clk, i_active=>i_active, i_rgb=>i_rgb,
+		i_mask=>mask, o_rgb=>o_rgb, o_valid=>o_valid);
 
 	-- clock generate
 	process
@@ -90,7 +90,7 @@ begin
 		i_active <= '0';
 		wait for reset_time;
 		i_active <= '1';
-		for i in 0 to i_img'length-1 loop
+		for i in i_img'range loop
 			i_rgb <= i_img(i);
 			wait for clk_period;
 		end loop;
