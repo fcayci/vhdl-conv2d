@@ -43,6 +43,7 @@ begin
 				o_pix <= to_signed(sum, 8);
 				o_valid <= '1';
 			else
+				--o_pix <= (others => '0');
 				o_valid <= '0';
 			end if;
 		end if;

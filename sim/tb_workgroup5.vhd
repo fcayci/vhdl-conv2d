@@ -44,13 +44,13 @@ architecture rtl of tb_workgroup5 is
 	);
 
 	-- laplacian mask
-	constant mask : mask5 := (
-		 0,  0, -1,  0,  0,
-		 0, -1, -2, -1,  0,
-		-1, -2, 16, -2, -1,
-		 0, -1, -2, -1,  0,
-		 0,  0, -1,  0,  0
-	);
+	-- constant mask : mask5 := (
+	-- 	 0,  0, -1,  0,  0,
+	-- 	 0, -1, -2, -1,  0,
+	-- 	-1, -2, 16, -2, -1,
+	-- 	 0, -1, -2, -1,  0,
+	-- 	 0,  0, -1,  0,  0
+	-- );
 
 	-- sharpen mask
 	-- constant mask : mask5 := (
@@ -60,24 +60,23 @@ architecture rtl of tb_workgroup5 is
 	-- );
 
 	-- identity mask
-	-- constant mask : mask5 := (
-	-- 	0, 0, 0, 0, 0,
-	-- 	0, 0, 0, 0, 0,
-	-- 	0, 0, 1, 0, 0,
-	-- 	0, 0, 0, 0, 0,
-	-- 	0, 0, 0, 0, 0
-	-- );
+	constant mask : mask5 := (
+		0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0,
+		0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0
+	);
 
-	signal o_img : pixel_array(0 to 24) := (others => (others => '0'));
-	signal i_rgb, o_rgb : pixel := (others => '0');
+	signal i_pix, o_pix : pixel := (others => '0');
 	signal i_active, o_valid : std_logic := '0';
 
 begin
 
 	uut0: entity work.workgroup
 		generic map(H=>H, W=>W, KS=>KS)
-		port map(clk=>clk, i_active=>i_active, i_rgb=>i_rgb,
-		i_mask=>mask, o_rgb=>o_rgb, o_valid=>o_valid);
+		port map(clk=>clk, i_active=>i_active, i_pix=>i_pix,
+		i_mask=>mask, o_pix=>o_pix, o_valid=>o_valid);
 
 	-- clock generate
 	process
@@ -95,7 +94,7 @@ begin
 		wait for reset_time;
 		i_active <= '1';
 		for i in i_img'range loop
-			i_rgb <= i_img(i);
+			i_pix <= i_img(i);
 			wait for clk_period;
 		end loop;
 		i_active <= '0';

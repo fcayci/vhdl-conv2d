@@ -4,6 +4,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+library work;
 use work.types.all;
 
 entity workgroup is
@@ -15,19 +16,19 @@ entity workgroup is
 	port(
 		clk      : in  std_logic;
 		i_active : in  std_logic; -- input active signal
-		i_rgb    : in  pixel; -- input rgb data
-		i_mask   : in  mask_array(0 to KS**2-1); -- 3x3 convolution mask
-		o_rgb    : out pixel; -- output rgb data
+		i_pix    : in  pixel; --  input pixel data
+		i_mask   : in  mask_array(0 to KS**2-1); -- 3x3 mask
+		o_pix    : out pixel; -- output pixel data
 		o_valid  : out std_logic -- output valid signal (for writing to a FIFO)
 	);
 end workgroup;
 
 architecture rtl of workgroup is
 	-- this will hold the first {mask size} rows
-	signal rows : pixel_array(0 to ((KS-1) * W) + KS-1);
+	signal rows : pixel_array(0 to ((KS-1) * W) + KS-1) := (others =>(others=>'0'));
 
 	-- window to be convoluted
-	signal window : pixel_array(0 to KS**2-1);
+	signal window : pixel_array(0 to KS**2-1) := (others =>(others=>'0'));
 
 	-- delay enable signal
 	-- it is {mask size-1 / 2} row big + {mask size-1 / 2} pixel for extra padding
@@ -38,14 +39,14 @@ begin
 
 	process(clk) is
 	begin
-		-- push the incoming rgb to the edge of the buffer
-		-- active is the signal that comes with rgb values
+		-- push the incoming pixel to the edge of the buffer
+		-- active is the signal that comes with pixel values
 		-- (video active area)
 		if rising_edge(clk) then
 			-- push the new pixel to the end of the buffer when active
 			-- flush the buffers when not active
 			if i_active = '1' then
-				rows <= rows(1 to rows'high) & i_rgb;
+				rows <= rows(1 to rows'high) & i_pix;
 			else
 				rows <= rows(1 to rows'high) & x"00";
 			end if;
@@ -70,7 +71,7 @@ begin
 	c2d: entity work.convolution2d(rtl)
 	generic map (KS=>KS)
 	port map (clk=>clk, i_enable=>enable(enable'high),
-		window=>window, mask=>i_mask, o_pix=>o_rgb,
+		window=>window, mask=>i_mask, o_pix=>o_pix,
 		o_valid=>o_valid);
 
 	-- assign window

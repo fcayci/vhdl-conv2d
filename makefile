@@ -5,7 +5,7 @@
 
 CC = ghdl
 SIM = gtkwave
-ARCHNAME = tb_workgroup3
+ARCHNAME = tb_imu3
 STOPTIME = 1us
 
 # update Xilinx Vivado installation path
@@ -21,6 +21,8 @@ VHDLSTD = --std=02
 SRCS += rtl/types.vhd
 SRCS += rtl/convolution2d.vhd
 SRCS += rtl/workgroup.vhd
+SRCS += rtl/mask.vhd
+SRCS += rtl/ipu.vhd
 
 TBS = $(wildcard sim/tb_*.vhd)
 TB = sim/$(ARCHNAME).vhd
