@@ -37,7 +37,6 @@ architecture rtl of tb_ipu3 is
 
 begin
 
-
 	uut0: entity work.ipu
 		--generic map(H=>H, W=>W, KS=>KS)
 		port map(clk=>clk, i_maskctrl=>i_maskctrl, i_active=>i_active, i_rgb=>i_rgb,
@@ -60,7 +59,7 @@ begin
 		i_active <= '1';
 		for i in 1 to H loop
 			for j in 1 to W loop
-				i_rgb <= std_logic_vector(to_signed(H*i+j,8) & to_signed(H*i+j,8) & to_signed(H*i+j,8));
+				i_rgb <= std_logic_vector(to_signed(W*i+j,8) & to_signed(W*i+j,8) & to_signed(W*i+j,8));
 				wait for clk_period;
 			end loop;
 		end loop;
