@@ -1,3 +1,6 @@
+-- author: Furkan Cayci, 2019
+-- description: custom pixel types
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -5,7 +8,8 @@ use ieee.numeric_std.all;
 package types is
 
 	-- 8-bit pixel type
-	subtype pixel is signed(7 downto 0); --integer range -128 to 127;
+	--subtype pixel_int is integer range -128 to 127;
+	subtype pixel is signed(7 downto 0);
 	type pixel_array is array(natural range <>) of pixel;
 
 	-- 8-bit mask type

@@ -1,5 +1,5 @@
 -- author: Furkan Cayci, 2019
--- description: image processing unit
+-- description: mask/kernel selector
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -11,8 +11,8 @@ entity mask is
 		KS : integer := 3 -- mask (kernel) size
 	);
 	port(
-		ctrl : in  std_logic_vector(2 downto 0);
-		mask : out mask_array(0 to KS**2-1)
+		i_ctrl : in  std_logic_vector(2 downto 0);
+		o_mask : out mask_array(0 to KS**2-1)
 	);
 end mask;
 
@@ -61,15 +61,15 @@ begin
 
 	m3_gen: if KS = 3 generate
 	begin
-	mask <= identity3 when ctrl = "000" else
-	            edge3 when ctrl = "001" else
-			 sharpen3;
+	o_mask <= identity3 when i_ctrl = "000" else
+		edge3 when i_ctrl = "001" else
+		sharpen3;
 	end generate;
 
 	m5_gen: if KS = 5 generate
 	begin
-	mask <= identity5 when ctrl = "000" else
-	        laplacian5;
+	o_mask <= identity5 when i_ctrl = "000" else
+		laplacian5;
 	end generate;
 
 end rtl;

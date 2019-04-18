@@ -1,10 +1,9 @@
 -- author: Furkan Cayci, 2019
--- description:
+-- description: module to store and distribute incoming pixel/masks to convolution
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-library work;
 use work.types.all;
 
 entity workgroup is
@@ -29,6 +28,9 @@ architecture rtl of workgroup is
 
 	-- window to be convoluted
 	signal window : pixel_array(0 to KS**2-1) := (others =>(others=>'0'));
+
+	-- mask to be convoluted
+	signal mask : mask_array(0 to KS**2-1) := (others => 0 );
 
 	-- delay enable signal
 	-- it is {mask size-1 / 2} row big + {mask size-1 / 2} pixel for extra padding
@@ -67,11 +69,19 @@ begin
 		end if;
 	end process;
 
+	-- buffer mask
+	process(clk) is
+	begin
+		if rising_edge(clk) then
+			mask <= i_mask;
+		end if;
+	end process;
+
 	-- 2d convolution
 	c2d: entity work.convolution2d(rtl)
 	generic map (KS=>KS)
 	port map (clk=>clk, i_enable=>enable(enable'high),
-		window=>window, mask=>i_mask, o_pix=>o_pix,
+		i_window=>window, i_mask=>mask, o_pix=>o_pix,
 		o_valid=>o_valid);
 
 	-- assign window

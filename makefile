@@ -5,7 +5,7 @@
 
 CC = ghdl
 SIM = gtkwave
-ARCHNAME = tb_imu3
+ARCHNAME = tb_ipu3
 STOPTIME = 1us
 
 # update Xilinx Vivado installation path
@@ -45,7 +45,7 @@ UNISRCS += $(UNISIM_PATH)/primitive/OSERDESE1.vhd
 OBJS = $(patsubst sim/%.vhd, %.bin, $(TBS))
 
 .PHONY: all
-all: clean analyze
+all: clean analyze simulate
 	@echo "completed..."
 
 .PHONY: analyze
@@ -55,7 +55,7 @@ analyze:
 	$(CC) -a --workdir=$(WORKDIR) -P$(WORKDIR)  $(VHDLSTD) $(SRCS) $(TBS)
 
 .PHONY: simulate
-simulate: clean analyze
+simulate:
 	@echo "simulating design:" $(TB)
 	$(CC) --elab-run --workdir=$(WORKDIR) -P$(WORKDIR) $(VHDLSTD) -fexplicit \
 	  --ieee=synopsys -o $(WORKDIR)/$(ARCHNAME).bin $(ARCHNAME) \

@@ -4,7 +4,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-library work;
 use work.types.all;
 
 entity ipu is
@@ -15,12 +14,12 @@ entity ipu is
 		KS : integer := 3    -- mask (kernel) size
 	);
 	port(
-		clk      : in  std_logic;
-		maskctrl : in  std_logic_vector(2 downto 0); -- mask control
-		i_active : in  std_logic; --  input active signal
-		i_rgb    : in  std_logic_vector(23 downto 0); -- input rgb data
-		o_active : out std_logic; -- output active signal
-		o_rgb    : out std_logic_vector(23 downto 0)  -- output rgb data
+		clk        : in  std_logic;
+		i_maskctrl : in  std_logic_vector(2 downto 0); -- mask control
+		i_active   : in  std_logic; --  input active signal
+		i_rgb      : in  std_logic_vector(23 downto 0); -- input rgb data
+		o_active   : out std_logic; -- output active signal
+		o_rgb      : out std_logic_vector(23 downto 0)  -- output rgb data
 	);
 end ipu;
 
@@ -40,7 +39,7 @@ begin
 
 	-- select mask
 	masksel: entity work.mask(rtl)
-	port map (ctrl=>maskctrl, mask=>mask);
+	port map (i_ctrl=>i_maskctrl, o_mask=>mask);
 
 	-- generate workgroup(s) for r,g,b channels
 	gen_channels: for i in 0 to 2 generate

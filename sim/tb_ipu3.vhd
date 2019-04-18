@@ -33,14 +33,14 @@ architecture rtl of tb_ipu3 is
 
 	signal i_rgb, o_rgb : std_logic_vector(23 downto 0) := (others => '0');
 	signal i_active, o_active : std_logic := '0';
-	signal maskctrl : std_logic_vector(2 downto 0) := "000";
+	signal i_maskctrl : std_logic_vector(2 downto 0) := "000";
 
 begin
 
 
 	uut0: entity work.ipu
 		--generic map(H=>H, W=>W, KS=>KS)
-		port map(clk=>clk, maskctrl=>maskctrl, i_active=>i_active, i_rgb=>i_rgb,
+		port map(clk=>clk, i_maskctrl=>i_maskctrl, i_active=>i_active, i_rgb=>i_rgb,
 		o_active=>o_active, o_rgb=>o_rgb);
 
 	-- clock generate
