@@ -9,12 +9,12 @@ package types is
 
 	-- 8-bit pixel type
 	--subtype pixel_int is integer range -128 to 127;
-	subtype pixel is signed(7 downto 0);
+	subtype pixel is unsigned(7 downto 0);
 	type pixel_array is array(natural range <>) of pixel;
 
 	-- 8-bit mask type
 	subtype mask is integer range -128 to 127;
-	type mask_array is array(integer range <>) of mask;
+	type mask_array is array(natural range <>) of mask;
 	-- 3x3 mask
 	subtype mask3 is mask_array(0 to 8);
 	-- 5x5 mask
