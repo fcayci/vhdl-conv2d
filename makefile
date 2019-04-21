@@ -6,7 +6,7 @@
 CC = ghdl
 SIM = gtkwave
 ARCHNAME = tb_ipu3
-STOPTIME = 1us
+STOPTIME = 10us
 
 # update Xilinx Vivado installation path
 XILINX_VIVADO ?= /opt/Xilinx/Vivado/2018.3
