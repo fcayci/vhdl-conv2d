@@ -43,9 +43,9 @@ architecture rtl of ipu is
 	signal u_i_rgb : unsigned(CHANNEL*PIXSIZE-1 downto 0);
 	signal u_o_rgb : unsigned(CHANNEL*PIXSIZE-1 downto 0);
 
-	-- +1 comes from convolution pipline delay
-	signal hsyncdelay : std_logic_vector((KS-1)/2*(W+1) + 1 downto 0) := (others => '0');
-	signal vsyncdelay : std_logic_vector((KS-1)/2*(W+1) + 1 downto 0) := (others => '0');
+	-- + X comes from convolution pipline delay
+	signal hsyncdelay : std_logic_vector((KS-1)/2*(W+1) + 3 downto 0) := (others => '0');
+	signal vsyncdelay : std_logic_vector((KS-1)/2*(W+1) + 3 downto 0) := (others => '0');
 
 begin
 

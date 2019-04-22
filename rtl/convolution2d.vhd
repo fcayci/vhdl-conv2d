@@ -26,9 +26,10 @@ entity convolution2d is
 end convolution2d;
 
 architecture rtl of convolution2d is
-	type pixel_extended is array(natural range <>) of signed(2*PIXSIZE downto 0);
+	type pixel_extended is array(natural range <>) of signed(2*PIXSIZE-1 downto 0);
 	signal x : pixel_extended(0 to KS**2-1) := (others => (others => '0'));
-	signal valid : std_logic := '0';
+	signal sum1, sum2, sum3 : signed(2*PIXSIZE-1 downto 0);
+	signal valid, valid1 : std_logic := '0';
 begin
 	-- two stage pipeline multiple, accumulate
 	-- also generate active signal
@@ -39,7 +40,7 @@ begin
 			if i_enable = '1' then
 				for n in 0 to KS-1 loop
 					for k in 0 to KS-1 loop
-						x(n*KS + k) <= signed('0' & i_window(n*KS + k)) * to_signed(i_mask(n*KS + k), 8);
+						x(n*KS + k) <= to_signed(to_integer(i_window(n*KS + k)) * i_mask(n*KS + k), 2*PIXSIZE);
 					end loop;
 				end loop;
 				-- delay valid by one
@@ -51,10 +52,15 @@ begin
 				valid <= '0';
 			end if;
 
-			sum := 0;
-			for i in x'range loop
-				sum := sum + to_integer(x(i));
-			end loop;
+			sum1 <= x(0) + x(1) + x(2);
+			sum2 <= x(3) + x(4) + x(5);
+			sum3 <= x(6) + x(7) + x(8);
+			sum := to_integer(sum1) + to_integer(sum2) + to_integer(sum3);
+
+			-- sum := 0;
+			-- for i in x'range loop
+			-- 	sum := sum + to_integer(x(i));
+			-- end loop;
 
 			-- take care of underflow/overflows
 			if sum < 0 then
@@ -65,7 +71,8 @@ begin
 				o_pix <= to_unsigned(sum, 8);
 			end if;
 
-			o_valid <= valid;
+			valid1 <= valid;
+			o_valid <= valid1;
 
 		end if;
 	end process;
