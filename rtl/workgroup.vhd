@@ -58,15 +58,12 @@ begin
 	process(clk) is
 	begin
 		if rising_edge(clk) then
-			row1 <= row1(1 to row1'high) & winbuf1(0);
-			winbuf2 <= winbuf2(1 to winbuf2'high) & row1(0);
-			row2 <= row2(1 to row2'high) & winbuf2(0);
-			winbuf3 <= winbuf3(1 to winbuf3'high) & row2(0);
-			-- first row shift reg
 			if i_active = '1' then
 				winbuf1 <= winbuf1(1 to winbuf1'high) & i_pix;
-			else
-				winbuf1 <= winbuf1(1 to winbuf1'high) & x"00";
+				row1 <= row1(1 to row1'high) & winbuf1(0);
+				winbuf2 <= winbuf2(1 to winbuf2'high) & row1(0);
+				row2 <= row2(1 to row2'high) & winbuf2(0);
+				winbuf3 <= winbuf3(1 to winbuf3'high) & row2(0);
 			end if;
 		end if;
 	end process;
