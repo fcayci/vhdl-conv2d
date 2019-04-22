@@ -17,7 +17,7 @@ VHDLSTD = --std=02
 
 # order is important
 #SRCS += rtl/clock_gen.vhd
-#SRCS += rtl/timing_generator.vhd
+SRCS += rtl/timing_generator.vhd
 SRCS += rtl/types.vhd
 SRCS += rtl/convolution2d.vhd
 SRCS += rtl/workgroup.vhd
@@ -52,12 +52,12 @@ all: clean analyze simulate
 analyze:
 	@echo "analyzing designs..."
 	@mkdir -p $(WORKDIR)
-	$(CC) -a --workdir=$(WORKDIR) -P$(WORKDIR)  $(VHDLSTD) $(SRCS) $(TBS)
+	$(CC) -a --workdir=$(WORKDIR) -P$(WORKDIR) $(VHDLSTD) $(SRCS) $(TBS)
 
 .PHONY: simulate
 simulate:
 	@echo "simulating design:" $(TB)
-	$(CC) --elab-run --workdir=$(WORKDIR) -P$(WORKDIR) $(VHDLSTD) -fexplicit \
+	$(CC) --elab-run --workdir=$(WORKDIR) -P$(WORKDIR) $(VHDLSTD) -v -fexplicit \
 	  --ieee=synopsys -o $(WORKDIR)/$(ARCHNAME).bin $(ARCHNAME) \
 	  --vcd=$(WORKDIR)/$(ARCHNAME).vcd --stop-time=$(STOPTIME)
 	$(SIM) $(WORKDIR)/$(ARCHNAME).vcd
