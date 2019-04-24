@@ -29,17 +29,17 @@ end workgroup;
 architecture rtl of workgroup is
 	-- this will hold the first {mask size} rows
 	signal rows : pixel_array(0 to ((KS-1) * W) + KS-1) := (others =>(others=>'0'));
-	signal row1: pixel_array(0 to W-KS-1) := (others => (others => '0'));
-	signal row2: pixel_array(0 to W-KS-1) := (others => (others => '0'));
+	-- signal row1: pixel_array(0 to W-KS-1) := (others => (others => '0'));
+	-- signal row2: pixel_array(0 to W-KS-1) := (others => (others => '0'));
 
 	-- window to be convoluted
 	signal window : pixel_array(0 to KS**2-1) := (others => (others => '0'));
-	signal winbuf1, winbuf2, winbuf3 : pixel_array(0 to KS-1) := (others => (others => '0'));
+	--signal winbuf1, winbuf2, winbuf3 : pixel_array(0 to KS-1) := (others => (others => '0'));
 
 	-- mask to be convoluted
 	signal mask : mask_array(0 to KS**2-1) := (others => 0 );
 
-	signal validrow,enable : std_logic := '0';
+	signal validrow, enable : std_logic := '0';
 	-- signal enable : std_logic_vector(KS-2 downto 0) := (others=>'0');
 
 begin
@@ -48,11 +48,12 @@ begin
 	begin
 		if rising_edge(clk) then
 			if i_active = '1' then
-				winbuf1 <= winbuf1(1 to winbuf1'high) & i_pix;
-				row1 <= row1(1 to row1'high) & winbuf1(0);
-				winbuf2 <= winbuf2(1 to winbuf2'high) & row1(0);
-				row2 <= row2(1 to row2'high) & winbuf2(0);
-				winbuf3 <= winbuf3(1 to winbuf3'high) & row2(0);
+				rows <= rows(1 to rows'high) & i_pix;
+				-- winbuf1 <= winbuf1(1 to winbuf1'high) & i_pix;
+				-- row1 <= row1(1 to row1'high) & winbuf1(0);
+				-- winbuf2 <= winbuf2(1 to winbuf2'high) & row1(0);
+				-- row2 <= row2(1 to row2'high) & winbuf2(0);
+				-- winbuf3 <= winbuf3(1 to winbuf3'high) & row2(0);
 			end if;
 		end if;
 	end process;
@@ -89,11 +90,11 @@ begin
 
 	-- assign window
 	-- auto generate based on the KS size
-	-- w_gen: for i in 0 to KS-1 generate
-	-- begin
-	-- 	window(i*KS to i*KS + KS-1) <= rows(i*W to i*W + KS-1);
-	-- end generate;
+	w_gen: for i in 0 to KS-1 generate
+	begin
+		window(i*KS to i*KS + KS-1) <= rows(i*W to i*W + KS-1);
+	end generate;
 
-	window <= winbuf3 & winbuf2 & winbuf1;
+	--window <= winbuf3 & winbuf2 & winbuf1;
 
 end rtl;
