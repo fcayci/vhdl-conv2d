@@ -29,6 +29,7 @@ architecture rtl of tb_workgroup3 is
 	constant RESOLUTION  : string  := "SIM";    -- HD720P, SVGA, VGA, SIM
 	constant GEN_PIX_LOC : boolean := true;     -- generate location counters for x / y coordinates
 	constant PIXEL_SIZE  : natural := 24;       -- RGB pixel total size. (R + G + B)
+	constant MAXWBITS    : integer := 12;
 	constant H           : natural := 8;
 	constant W           : natural := 10;
 	constant KS          : natural := 3; -- mask size
@@ -66,14 +67,15 @@ architecture rtl of tb_workgroup3 is
 	);
 
 	signal i_pix, o_pix : pixel := (others => '0');
-	signal i_active, o_valid : std_logic := '0';
+	signal i_active : std_logic := '0';
+	signal i_hcounter : unsigned(MAXWBITS-1 downto 0) := (others=>'0');
 
 begin
 
 	uut0: entity work.workgroup
 		generic map(H=>H, W=>W, KS=>KS)
-		port map(clk=>clk, i_active=>i_active, i_pix=>i_pix,
-		i_mask=>mask, o_pix=>o_pix, o_valid=>o_valid);
+		port map(clk=>clk, i_hcounter=>i_hcounter, i_active=>i_active, i_pix=>i_pix,
+		i_mask=>mask, o_pix=>o_pix);
 
 	-- clock generate
 	process

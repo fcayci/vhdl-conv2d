@@ -11,8 +11,11 @@ entity ipu is
 		PIXSIZE : integer := 8; -- 1 channel pixel size
 		CHANNEL : integer := 3; -- number of color channels
 		SYNCPASS : boolean := true; -- generate hsync/vsync pass through
+		SYNCPOL : boolean := true; -- hsync/vsync polarity
+		MAXWBITS : integer := 12; -- max number of bits for width
 		H  : integer := 720; -- height of image
 		W  : integer := 1280; -- width of image
+		WLINE : integer := 1648; -- width of a full line
 		KS : integer := 3    -- mask (kernel) size
 	);
 	port(
@@ -21,15 +24,15 @@ entity ipu is
 		-- mask selector
 		i_maskctrl : in  std_logic_vector(2 downto 0); -- mask control
 
-		-- input signals
-		i_active   : in  std_logic; --  input active signal
-		i_rgb      : in  std_logic_vector(CHANNEL*PIXSIZE-1 downto 0); -- input rgb data
+		-- video input signals
+		i_rgb      : in  std_logic_vector(CHANNEL*PIXSIZE-1 downto 0);
+		i_active   : in  std_logic;
 		i_hsync    : in  std_logic;
 		i_vsync    : in  std_logic;
 
-		-- output signals
-		o_active   : out std_logic; -- output active signal
-		o_rgb      : out std_logic_vector(CHANNEL*PIXSIZE-1 downto 0); -- output rgb data
+		-- video output signals
+		o_rgb      : out std_logic_vector(CHANNEL*PIXSIZE-1 downto 0);
+		o_active   : out std_logic;
 		o_hsync    : out std_logic;
 		o_vsync    : out std_logic
 	);
@@ -43,9 +46,13 @@ architecture rtl of ipu is
 	signal u_i_rgb : unsigned(CHANNEL*PIXSIZE-1 downto 0);
 	signal u_o_rgb : unsigned(CHANNEL*PIXSIZE-1 downto 0);
 
+	signal hsyncbuf, vsyncbuf, activebuf : std_logic := '0';
+	signal hcounter : unsigned(MAXWBITS-1 downto 0) := (others => '0');
+
 	-- + X comes from convolution pipline delay
-	signal hsyncdelay : std_logic_vector((KS-1)/2*(W+1) + 3 downto 0) := (others => '0');
-	signal vsyncdelay : std_logic_vector((KS-1)/2*(W+1) + 3 downto 0) := (others => '0');
+	signal hsyncdelay : std_logic_vector((KS-1)/2*(WLINE+1) + 4 downto 0) := (others => '0');
+	signal vsyncdelay : std_logic_vector((KS-1)/2*(WLINE+1) + 4 downto 0) := (others => '0');
+	signal activedelay : std_logic_vector((KS-1)/2*(WLINE+1) + 4 downto 0) := (others => '0');
 
 begin
 
@@ -53,19 +60,38 @@ begin
 	u_i_rgb <= unsigned(i_rgb);
 	o_rgb <= std_logic_vector(u_o_rgb);
 
-	-- generate hsync/vsync pass through mode
-	sync_i: if SYNCPASS = true generate
+	-- line counter using falling edge detector
+	-- which is used to omit first and last rows
+	process(clk) is
 	begin
-	-- assign hsync/vsync
+		if rising_edge(clk) then
+			vsyncbuf <= i_vsync;
+			activebuf <= i_active;
+
+			if (activebuf = '1') and (i_active = '0') then
+				hcounter <= hcounter + 1;
+			end if;
+			if (vsyncbuf = '1') and (i_vsync = '0') then
+				hcounter <= (others => '0');
+			end if;
+		end if;
+	end process;
+
+	-- generate hsync/vsync/active pass through mode
+	-- delay for one row + convolution pipeline steps
+	passthrough: if SYNCPASS = true generate
+	-- -- assign hsync/vsync/active
 	o_hsync <= hsyncdelay(hsyncdelay'high);
 	o_vsync <= vsyncdelay(vsyncdelay'high);
+	o_active <= activedelay(activedelay'high);
 
-	-- hsync/vsync delay
+	-- hsync/vsync/active delay
 	process(clk)
 	begin
 		if rising_edge(clk) then
 			hsyncdelay <= hsyncdelay(hsyncdelay'high -1 downto 0) & i_hsync;
 			vsyncdelay <= vsyncdelay(vsyncdelay'high -1 downto 0) & i_vsync;
+			activedelay <= activedelay(activedelay'high -1 downto 0) & i_active;
 		end if;
 	end process;
 	end generate;
@@ -79,12 +105,8 @@ begin
 	begin
 		wg: entity work.workgroup(rtl)
 		generic map (PIXSIZE=>PIXSIZE, H=>H, W=>W, KS=>KS)
-		port map (clk=>clk, i_active=>i_active, i_pix=>u_i_rgb(i*PIXSIZE-1 downto (i-1)*PIXSIZE),
-		i_mask=>mask, o_pix=>u_o_rgb(i*PIXSIZE-1 downto (i-1)*PIXSIZE),
-		o_valid=>active(i-1));
+		port map (clk=>clk, i_hcounter=>hcounter, i_active=>i_active, i_pix=>u_i_rgb(i*PIXSIZE-1 downto (i-1)*PIXSIZE),
+		i_mask=>mask, o_pix=>u_o_rgb(i*PIXSIZE-1 downto (i-1)*PIXSIZE));
 	end generate;
-
-	-- since they are all parallel, one of them should be enough
-	o_active <= active(0) or active(1) or active(2);
 
 end rtl;

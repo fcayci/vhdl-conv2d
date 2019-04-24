@@ -20,8 +20,8 @@ entity convolution2d is
 		i_window : in  pixel_array(0 to KS**2-1);
 		i_mask   : in  mask_array(0 to KS**2-1);
 		-- output pixel and valid signals
-		o_pix    : out pixel;
-		o_valid  : out std_logic
+		o_pix    : out pixel
+		--o_valid  : out std_logic
 	);
 end convolution2d;
 
@@ -29,7 +29,7 @@ architecture rtl of convolution2d is
 	type pixel_extended is array(natural range <>) of signed(2*PIXSIZE-1 downto 0);
 	signal x : pixel_extended(0 to KS**2-1) := (others => (others => '0'));
 	signal sum1, sum2, sum3 : signed(2*PIXSIZE-1 downto 0);
-	signal valid, valid1 : std_logic := '0';
+	--signal valid, valid1 : std_logic := '0';
 begin
 	-- two stage pipeline multiple, accumulate
 	-- also generate active signal
@@ -44,23 +44,18 @@ begin
 					end loop;
 				end loop;
 				-- delay valid by one
-				valid <= '1';
+				-- valid <= '1';
 			else
 				for i in x'range loop
 					x(i) <= (others => '0');
 				end loop;
-				valid <= '0';
+				-- valid <= '0';
 			end if;
 
 			sum1 <= x(0) + x(1) + x(2);
 			sum2 <= x(3) + x(4) + x(5);
 			sum3 <= x(6) + x(7) + x(8);
 			sum := to_integer(sum1) + to_integer(sum2) + to_integer(sum3);
-
-			-- sum := 0;
-			-- for i in x'range loop
-			-- 	sum := sum + to_integer(x(i));
-			-- end loop;
 
 			-- take care of underflow/overflows
 			if sum < 0 then
@@ -71,8 +66,8 @@ begin
 				o_pix <= to_unsigned(sum, 8);
 			end if;
 
-			valid1 <= valid;
-			o_valid <= valid1;
+			-- valid1 <= valid;
+			-- o_valid <= valid1;
 
 		end if;
 	end process;

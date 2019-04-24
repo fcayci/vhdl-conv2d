@@ -19,8 +19,9 @@ architecture rtl of tb_ipu3 is
 	constant PIXSIZE     : integer := 8; -- pixel size
 	constant CHANNEL     : integer := 3; -- number of color channels
 	constant SYNCPASS    : boolean := true; -- generate hsync/vsync pass through
-	constant H           : natural := 8;
-	constant W           : natural := 12;
+	constant H           : natural := 8;  -- from timings
+	constant W           : natural := 12; -- from timings
+	constant WLINE       : natural := 20; -- from timings
 	constant KS          : natural := 3; -- mask size
 
 	signal i_rgb, o_rgb : std_logic_vector(CHANNEL*PIXSIZE-1 downto 0) := (others => '0');
@@ -30,7 +31,7 @@ architecture rtl of tb_ipu3 is
 begin
 
 	uut0: entity work.ipu
-		generic map(H=>H, W=>W, KS=>KS, PIXSIZE=>PIXSIZE, CHANNEL=>CHANNEL, SYNCPASS=>SYNCPASS)
+		generic map(H=>H, W=>W, WLINE=>WLINE, KS=>KS, PIXSIZE=>PIXSIZE, CHANNEL=>CHANNEL, SYNCPASS=>SYNCPASS)
 		port map(clk=>clk, i_maskctrl=>maskctrl,
 		i_active=>active, i_hsync=>hsync, i_vsync=>vsync, i_rgb=>i_rgb,
 		o_active=>o_active, o_hsync=>o_hsync, o_vsync=>o_vsync, o_rgb=>o_rgb);
